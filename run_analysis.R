@@ -54,14 +54,12 @@ mms <- read.table("mms_labeled.txt", header = TRUE)
 subs <- unique(mms$subject)
 acts <- as.character(unique(mms$activity))
 mms_avg <- data.frame(stringsAsFactors=FALSE)
-count <- 1
 for(sub in subs) {
   mmsg <- subset(mms, subject == sub)
   for(act in acts) {
     g <- subset(mms, activity == act)
     avg <- colMeans(g[,-c(1,ncol(g))], na.rm = TRUE)
     mms_avg <- rbind(mms_avg, data.frame(sub, act, t(avg)))
-    count <- count + 1
   }
 }
 colnames(mms_avg) <- c("subject", "activity", colnames(mms[,-c(1,ncol(mms))]))
