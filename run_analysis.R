@@ -56,23 +56,35 @@
 #    of each variable for each activity and each subject.
 mms <- read.table("mms_labeled.txt", header = TRUE)
 
-# aggregate(x = mms, by = list(activity), FUN = "mean")
-# aggregate(mms$tBodyAcc.mean...X ~ subject, mms, mean)
-
 subs <- unique(mms$subject)
-acts <- unique(mms$activity)
-# subs
-mms_avg <- data.frame()
+acts <- as.character(unique(mms$activity))
+mms_avg <- data.frame(stringsAsFactors=FALSE)
+count <- 1
+# for(act in c("WALKING", "STANDING")) {
+# for(act in acts) {
 for(sub in subs) {
+# for(sub in c(1,3)) {
+  # g <- subset(mms, subject == sub)
+  mmsg <- subset(mms, subject == sub)
+  # for(act in c("WALKING")) {
   for(act in acts) {
-    g <- subset(mms, subject == sub & activity == act)
-    avg <- colMeans(g[,-c(1,ncol(g))])
-    # avg <- mean(subset(mms, subject == sub))
-    # print(avg)
-    mms_avg <- rbind(mms_avg, c(sub, avg))
+    # g <- subset(mms, (subject == sub) & (activity == act))
+    g <- subset(mms, activity == act)
+    avg <- colMeans(g[,-c(1,ncol(g))], na.rm = TRUE)
+    # print(paste0(sub,act,count))
+    # str(c(sub, act, avg))
+    # r <- c(act, avg)
+    # print(r)
+    # mms_avg <- rbind(mms_avg, data.frame(act, t(avg)))
+    # mms_avg <- rbind(mms_avg, c(sub, avg))
+    mms_avg <- rbind(mms_avg, data.frame(sub, act, t(avg)))
+    # print(mms_avg)
+    count <- count + 1
   }
 }
-colnames(mms_avg) <- colnames(mms[,-ncol(mms)])
+# mms_avg
+# colnames(mms_avg) <- c("activity", colnames(mms[,-c(1,ncol(mms))]))
+colnames(mms_avg) <- c("subject", "activity", colnames(mms[,-c(1,ncol(mms))]))
 write.table(mms_avg, file = "mms_avg.txt", row.name=FALSE)
 
 tidy <- read.table("mms_avg.txt", header = TRUE)
