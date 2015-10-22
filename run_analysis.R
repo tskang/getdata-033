@@ -8,20 +8,20 @@
 
 # 1. Merge the training and the test sets to create one data set.
 # read the training set
-d11 <- read.table("train/subject_train.txt")
-d12 <- read.table("train/X_train.txt")
-d13 <- read.table("train/y_train.txt")
-d1 <- cbind(d11, d12, d13)
+# d11 <- read.table("train/subject_train.txt")
+# d12 <- read.table("train/X_train.txt")
+# d13 <- read.table("train/y_train.txt")
+# d1 <- cbind(d11, d12, d13)
 
 # read the test set
-d21 <- read.table("test/subject_test.txt")
-d22 <- read.table("test/X_test.txt")
-d23 <- read.table("test/y_test.txt")
-d2 <- cbind(d21, d22, d23)
+# d21 <- read.table("test/subject_test.txt")
+# d22 <- read.table("test/X_test.txt")
+# d23 <- read.table("test/y_test.txt")
+# d2 <- cbind(d21, d22, d23)
 
-merged <- rbind(d1, d2)
-write.table(merged, file = "merged.txt", row.name=FALSE)
-# merged <- read.table("merged.txt")
+# merged <- rbind(d1, d2)
+# write.table(merged, file = "merged.txt", row.name=FALSE)
+merged <- read.table("merged.txt", header = TRUE)
 
 # 2. Extract only the measurements on the mean and standard deviation for each measurement. 
 # read the features
@@ -39,7 +39,7 @@ a <- read.table("activity_labels.txt")
 # write.table(mms, file = "mms_activity.txt", row.name=FALSE)
 
 # 4. Appropriately labels the data set with descriptive variable names. 
-colnames(mms) <- c("subject", ms$V2, "activity")
+colnames(mms) <- c("subject", as.character(ms$V2), "activity")
 # for(act in a) {
 #   mms$activity[mms$activity == act$V1] <- act$V2
 # }
@@ -54,6 +54,9 @@ write.table(mms, file = "mms_labeled.txt", row.name=FALSE)
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average 
 #    of each variable for each activity and each subject.
-mms <- read.table("mms_labeled.txt")
+# mms <- read.table("mms_labeled.txt", header = TRUE)
+
+# aggregate(x = mms, by = list(activity), FUN = "mean")
+# aggregate(activity, mms, mean)
 
 
