@@ -21,42 +21,58 @@
 
 # merged <- rbind(d1, d2)
 # write.table(merged, file = "merged.txt", row.name=FALSE)
-merged <- read.table("merged.txt", header = TRUE)
-
-# 2. Extract only the measurements on the mean and standard deviation for each measurement. 
-# read the features
-f <- read.table("features.txt")
-# grep mean and standard deviation: mean 33, std 33
-m <- subset(f, grepl("mean\\(\\)", V2))
-s <- subset(f, grepl("std\\(\\)", V2))
-ms <- rbind(m, s) # 66 obs.
-mms <- merged[c(1, 1 + ms$V1, ncol(merged))]
-# mms <- read.table("mms.txt")
-
-# 3. Uses descriptive activity names to name the activities in the data set
-# read activity labels
-a <- read.table("activity_labels.txt")
-# write.table(mms, file = "mms_activity.txt", row.name=FALSE)
-
-# 4. Appropriately labels the data set with descriptive variable names. 
-colnames(mms) <- c("subject", as.character(ms$V2), "activity")
-# for(act in a) {
-#   mms$activity[mms$activity == act$V1] <- act$V2
-# }
-mms$activity[mms$activity == 1] <- "WALKING"
-mms$activity[mms$activity == 2] <- "WALKING_UPSTAIRS"
-mms$activity[mms$activity == 3] <- "WALKING_DOWNSTAIRS"
-mms$activity[mms$activity == 4] <- "SITTING"
-mms$activity[mms$activity == 5] <- "STANDING"
-mms$activity[mms$activity == 6] <- "LAYING"
-
-write.table(mms, file = "mms_labeled.txt", row.name=FALSE)
+# merged <- read.table("merged.txt", header = TRUE)
+# 
+# # 2. Extract only the measurements on the mean and standard deviation for each measurement. 
+# # read the features
+# f <- read.table("features.txt")
+# # grep mean and standard deviation: mean 33, std 33
+# m <- subset(f, grepl("mean\\(\\)", V2))
+# s <- subset(f, grepl("std\\(\\)", V2))
+# ms <- rbind(m, s) # 66 obs.
+# mms <- merged[c(1, 1 + ms$V1, ncol(merged))]
+# # mms <- read.table("mms.txt")
+# 
+# # 3. Uses descriptive activity names to name the activities in the data set
+# # read activity labels
+# a <- read.table("activity_labels.txt")
+# # write.table(mms, file = "mms_activity.txt", row.name=FALSE)
+# 
+# # 4. Appropriately labels the data set with descriptive variable names. 
+# colnames(mms) <- c("subject", as.character(ms$V2), "activity")
+# # for(act in a) {
+# #   mms$activity[mms$activity == act$V1] <- act$V2
+# # }
+# mms$activity[mms$activity == 1] <- "WALKING"
+# mms$activity[mms$activity == 2] <- "WALKING_UPSTAIRS"
+# mms$activity[mms$activity == 3] <- "WALKING_DOWNSTAIRS"
+# mms$activity[mms$activity == 4] <- "SITTING"
+# mms$activity[mms$activity == 5] <- "STANDING"
+# mms$activity[mms$activity == 6] <- "LAYING"
+# 
+# write.table(mms, file = "mms_labeled.txt", row.name=FALSE)
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average 
 #    of each variable for each activity and each subject.
-# mms <- read.table("mms_labeled.txt", header = TRUE)
+mms <- read.table("mms_labeled.txt", header = TRUE)
 
 # aggregate(x = mms, by = list(activity), FUN = "mean")
-# aggregate(activity, mms, mean)
+# aggregate(mms$tBodyAcc.mean...X ~ subject, mms, mean)
 
+subs <- unique(mms$subject)
+acts <- unique(mms$activity)
+# subs
+mms_avg <- data.frame()
+for(sub in subs) {
+  for(act in acts) {
+    g <- subset(mms, subject == sub & activity == act)
+    avg <- colMeans(g[,-c(1,ncol(g))])
+    # avg <- mean(subset(mms, subject == sub))
+    # print(avg)
+    mms_avg <- rbind(mms_avg, c(sub, avg))
+  }
+}
+colnames(mms_avg) <- colnames(mms[,-ncol(mms)])
+write.table(mms_avg, file = "mms_avg.txt", row.name=FALSE)
 
+tidy <- read.table("mms_avg.txt", header = TRUE)
